@@ -1,3 +1,6 @@
 docker/logs/
 docker/dags/__pycache__/
 app/__pycache__/
+.env
+.env.*
+!.env.example

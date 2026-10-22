@@ -6,7 +6,12 @@ WORKDIR /app
 
 # Install the required dependencies
 RUN apt-get update && \
-    apt-get install -y build-essential python3-dev libatlas-base-dev
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    python3-dev \
+    libblas-dev \
+    liblapack-dev && \
+    rm -rf /var/lib/apt/lists/*
 COPY requirements.txt /app
 RUN pip install --no-cache-dir -r requirements.txt
 

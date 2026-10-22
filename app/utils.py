@@ -27,9 +27,13 @@ import torch
 import joblib
 from transformers import AutoTokenizer, AutoModel
 import numpy as np
+import os
 
 # Configuration du logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+API_URL = "https://api.mistral.ai/v1/chat/completions"
 
 #####################################
 # Fonctions Utilitaires & Connexion DB
@@ -183,11 +187,9 @@ def extract_text_from_pdf(pdf_path):
         logging.error("Erreur d'extraction du texte depuis %s: %s", pdf_path, e)
         return None
 
-# Appel à l'API Mistral avec mécanisme de retry
-MISTRAL_API_KEY = ""  # Adaptez votre clé API
-API_URL = "https://api.mistral.ai/v1/chat/completions"
 
-def query_mistral(prompt, retries=3, delay=2):
+
+def query_mistral(prompt, retries=3, delay=4):
     headers = {
         "Authorization": f"Bearer {MISTRAL_API_KEY}",
         "Content-Type": "application/json"
@@ -535,10 +537,10 @@ def plot_tsne(X, labels, title="t-SNE Visualisation des Clusters"):
     return fig
 
 # Chargement du modèle FlauBERT
-HF_TOKEN = "token HF"
+HF_TOKEN = os.getenv("HF_TOKEN")
 
-tokenizer = AutoTokenizer.from_pretrained("flaubert/flaubert_base_uncased")
-model = AutoModel.from_pretrained("flaubert/flaubert_base_uncased")
+tokenizer = AutoTokenizer.from_pretrained("flaubert/flaubert_base_uncased", token=HF_TOKEN or None)
+model = AutoModel.from_pretrained("flaubert/flaubert_base_uncased", token=HF_TOKEN or None)
 
 def generate_offers_embeddings(offers_df, text_column="description", save_path="embeddings_offres.joblib"):
     """

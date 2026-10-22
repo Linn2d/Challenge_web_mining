@@ -11,7 +11,10 @@ from utils import get_db_connection, fix_json_value  # Assurez-vous que fix_json
 
 
 # Configure l'API Gemini
-GEMINI_API_KEY = '' # Ajouter la clé API ici
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+if not GEMINI_API_KEY:
+    raise ValueError("La variable GEMINI_API_KEY n'est pas définie.")
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-2.0-flash-exp")
 

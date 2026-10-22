@@ -1,17 +1,33 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:latest
     container_name: my_postgres_container
     environment:
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
-      POSTGRES_DB: "webmining"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: webmining
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d webmining"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: ./app
+    container_name: webmining_app
+    ports:
+      - "8501:8501"
+    environment:
+      HF_TOKEN: ${HF_TOKEN}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:
