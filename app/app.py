@@ -13,7 +13,8 @@ from utils import (
     generate_offers_embeddings,
     restore_annonces,
     generate_candidate_embeddings,
-    get_candidatures
+    get_candidatures,
+    load_cv_image
 )
 import time
 from st_aggrid import AgGrid, GridOptionsBuilder
@@ -70,7 +71,8 @@ if not table_exists("annonces"):
     # st.info("La table 'annonces' n'existe pas. Importation des PDF...")
     restore_annonces()
 else:
-    st.info("La table 'annonces' existe déjà.")
+   print("La table 'annonces' existe déjà.")
+   
 
 # Style CSS personnalisé
 st.markdown("""
@@ -218,57 +220,18 @@ with tabs[1]:
     st.subheader("📄 Parcourez les Candidatures")
     st.write("Téléchargez un CV et une Lettre de Motivation pour un candidat.")
     col1, col2 = st.columns(2)
-    
-    # with col1:
-    #     cv_file = st.file_uploader("Téléchargez votre CV (PDF ou Image)", type=["pdf", "jpg", "jpeg", "png"])
-    #     if cv_file is not None:
-    #         with st.expander("Aperçu du CV :"):
-    #             if cv_file.type == "application/pdf":
-    #                 with open("cv_temp.pdf", "wb") as f:
-    #                     f.write(cv_file.read())
-    #                 show_pdf("cv_temp.pdf")
-    #             elif cv_file.type in ["image/jpeg", "image/png", "image/jpg"]:
-    #                 st.download_button(label="Télécharger le CV", data=cv_file, file_name="cv_image.jpg", mime="image/jpeg")
-    #                 st.image(cv_file, caption="Aperçu de l'image du CV", use_container_width=True)
-    
-    # with col2:
-    #     lm_file = st.file_uploader("Téléchargez votre Lettre de Motivation (PDF)", type=["pdf"])
-    #     if lm_file is not None:
-    #         with st.expander("Aperçu de la Lettre de Motivation :"):
-    #             if lm_file.type == "application/pdf":
-    #                 with open("lm_temp.pdf", "wb") as f:
-    #                     f.write(lm_file.read())
-    #                 show_pdf("lm_temp.pdf")
-    #         if st.button("Démarrer l'Analyse"):
-    #             progress_bar = st.progress(0)
-    #             result = None
-    #             for i in range(1, 101):
-    #                 time.sleep(0.10)
-    #                 progress_bar.progress(i)
-    #                 if i == 100:
-    #                     # Note : process_and_store_lm attend un cv_id en argument, ici on utilise une valeur d'exemple.
-    #                     result = process_and_store_lm("lm_temp.pdf", "IDXXXXXX")
-    #             if result:
-    #                 st.write("Données extraites :")
-    #                 st.markdown('<h3>🏷️ Compétences</h3>', unsafe_allow_html=True)
-    #                 st.markdown(f'<p>Compétences mentionnées : <span class="highlight">{result["competences"]}</span></p>', unsafe_allow_html=True)
-    #                 st.markdown('<h3>🌍 Localisation</h3>', unsafe_allow_html=True)
-    #                 st.markdown(f'<p>Lieu de travail souhaité : <span class="highlight">{result["lieu"]}</span></p>', unsafe_allow_html=True)
-    #                 st.markdown('<h3>💬 Motivations</h3>', unsafe_allow_html=True)
-    #                 st.markdown(f'<p>Motivations mentionnées : <span class="highlight">{result["motivations"]}</span></p>', unsafe_allow_html=True)
-    #                 st.success("Analyse terminée et données insérées dans la base.")
    
     with col1:
-        cv_image = st.file_uploader("Téléchargez le CV (Image)", type=["jpg", "jpeg", "png"])
+        cv_image = st.file_uploader("Téléchargez le CV (Image ou PDF)", type=["jpg", "jpeg", "png", "pdf"])
         if cv_image is not None:
             # Bouton pour afficher l'aperçu du CV
             if st.button("Afficher Aperçu du CV", key="preview_cv"):
-                img = PIL.Image.open(cv_image)
+                img = load_cv_image(cv_image)
                 st.image(img, caption="Aperçu de l'image du CV", use_container_width=True)
 
             # Bouton pour analyser et valider le CV
             if st.button("Valider", key="validate_cv"):
-                img = PIL.Image.open(cv_image)
+                img = load_cv_image(cv_image)
                 progress_bar = st.progress(0)
                 result_df = None
                 for i in range(1, 101):

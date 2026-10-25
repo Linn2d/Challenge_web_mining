@@ -17,8 +17,9 @@ pyarrow
 matplotlib
 plotly
 sacremoses
-google-generativeai
+google-genai
 thinc==8.3.11
 cymem==2.0.11
 murmurhash==1.0.12
 preshed==3.0.9
+torchvision

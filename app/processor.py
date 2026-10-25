@@ -3,7 +3,7 @@ import json
 import random
 import xml.etree.ElementTree as ET
 import pandas as pd
-import google.generativeai as genai
+from google import genai
 import os
 import logging
 import pandas as pd
@@ -15,8 +15,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 if not GEMINI_API_KEY:
     raise ValueError("La variable GEMINI_API_KEY n'est pas définie.")
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-2.0-flash-exp")
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 def get_text_or_empty(element, tag):
     """
@@ -156,11 +155,11 @@ Ne prends pas les publications.
 </CV>
 """
     # Appel à l'API Gemini avec le prompt et l'image (objet PIL)
-    response = model.generate_content(
-        [prompt, img],
-        stream=True,
+    response = client.models.generate_content(
+        model="gemini-3.5-flash-lite",
+        contents=[prompt, img],
     )
-    response.resolve()
+    
     xml_data = response.text
     df = parse_xml_to_df(xml_data)
     return df

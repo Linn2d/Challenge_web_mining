@@ -28,6 +28,9 @@ import joblib
 from transformers import AutoTokenizer, AutoModel
 import numpy as np
 import os
+import time
+import PIL.Image
+import pypdfium2 as pdfium
 
 # Configuration du logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -188,34 +191,118 @@ def extract_text_from_pdf(pdf_path):
         return None
 
 
-
-def query_mistral(prompt, retries=3, delay=4):
+def query_mistral(prompt, retries=5, delay=4):
     headers = {
         "Authorization": f"Bearer {MISTRAL_API_KEY}",
         "Content-Type": "application/json"
     }
     data = {
-        "model": "mistral-medium",
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.7
+        "model": "mistral-small-2603",
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "temperature": 0.2
     }
     for attempt in range(1, retries + 1):
         try:
-            response = requests.post(API_URL, headers=headers, json=data)
-            if response.status_code != 200:
-                logging.error("Erreur API (status %s): %s", response.status_code, response.text)
-                sleep(delay)
-                continue
-            content = response.json()["choices"][0]["message"]["content"]
-            result = json.loads(content)
-            return result
-        except (json.JSONDecodeError, KeyError) as e:
-            logging.warning("Tentative %s: Erreur JSON: %s", attempt, e)
-            sleep(delay)
-        except Exception as e:
-            logging.error("Tentative %s: Erreur lors de l'appel à l'API: %s", attempt, e)
-            sleep(delay)
+            response = requests.post(
+                API_URL,
+                headers=headers,
+                json=data,
+                timeout=60
+            )
+            # Succès
+            if response.status_code == 200:
+                try:
+                    content = response.json()["choices"][0]["message"]["content"]
+                    return json.loads(content)
+
+                except (json.JSONDecodeError, KeyError, IndexError) as e:
+                    logging.error(
+                        "Réponse Mistral invalide : %s", e
+                    )
+                    return None
+            # Limite de débit atteinte
+            if response.status_code == 429:
+                retry_after = response.headers.get("Retry-After")
+                try:
+                    wait_time = (
+                        float(retry_after)
+                        if retry_after is not None
+                        else delay * (2 ** (attempt - 1))
+                    )
+                except ValueError:
+                    wait_time = delay * (2 ** (attempt - 1))
+                if attempt < retries:
+                    logging.warning(
+                        "Mistral : limite 429 atteinte. "
+                        "Tentative %s/%s dans %.1f secondes.",
+                        attempt, retries, wait_time
+                    )
+                    time.sleep(wait_time)
+                    continue
+                logging.error(
+                    "Mistral : limite 429 toujours atteinte après %s tentatives. "
+                    "Réponse : %s",
+                    retries, response.text
+                )
+                return None
+
+            # Autres erreurs HTTP
+            logging.error(
+                "Erreur API Mistral (status %s) : %s",
+                response.status_code,
+                response.text
+            )
+
+            # Inutile de réessayer pour la plupart des erreurs 4xx
+            if 400 <= response.status_code < 500:
+                return None
+
+            if attempt < retries:
+                time.sleep(delay * (2 ** (attempt - 1)))
+
+        except requests.RequestException as e:
+            logging.warning(
+                "Tentative %s/%s : erreur réseau Mistral : %s",
+                attempt, retries, e
+            )
+
+            if attempt < retries:
+                time.sleep(delay * (2 ** (attempt - 1)))
+
+    logging.error("Échec de l'appel à Mistral après %s tentatives.", retries)
     return None
+# def query_mistral(prompt, retries=3, delay=4):
+#     headers = {
+#         "Authorization": f"Bearer {MISTRAL_API_KEY}",
+#         "Content-Type": "application/json"
+#     }
+#     data = {
+#         "model": "mistral-small-2603",
+#         "messages": [{"role": "user", "content": prompt}],
+#         "temperature": 0.7
+#     }
+#     for attempt in range(1, retries + 1):
+#         try:
+#             response = requests.post(API_URL, headers=headers, json=data)
+#             if response.status_code != 200:
+#                 logging.error("Erreur API (status %s): %s", response.status_code, response.text)
+#                 sleep(delay)
+#                 continue
+#             content = response.json()["choices"][0]["message"]["content"]
+#             result = json.loads(content)
+#             return result
+#         except (json.JSONDecodeError, KeyError) as e:
+#             logging.warning("Tentative %s: Erreur JSON: %s", attempt, e)
+#             sleep(delay)
+#         except Exception as e:
+#             logging.error("Tentative %s: Erreur lors de l'appel à l'API: %s", attempt, e)
+#             sleep(delay)
+#     return None
 
 #📌 Extraction des données via l'API Mistral
 def extract_data(text):
@@ -714,3 +801,34 @@ def get_candidatures():
     df = pd.read_sql(query, conn)
     conn.close()
     return df
+
+def pdf_to_image(pdf_bytes, scale=2.0, max_pages=3):
+    """Convertit un PDF en une seule image (pages empilées verticalement)."""
+    pdf = pdfium.PdfDocument(pdf_bytes)
+    try:
+        nb_pages = min(len(pdf), max_pages)
+        pages = [
+            pdf[i].render(scale=scale).to_pil().convert("RGB")
+            for i in range(nb_pages)
+        ]
+    finally:
+        pdf.close()
+
+    if len(pages) == 1:
+        return pages[0]
+
+    width = max(p.width for p in pages)
+    height = sum(p.height for p in pages)
+    combined = PIL.Image.new("RGB", (width, height), "white")
+    y = 0
+    for p in pages:
+        combined.paste(p, (0, y))
+        y += p.height
+    return combined
+
+
+def load_cv_image(uploaded_file):
+    """Retourne une image PIL, que le fichier envoyé soit une image ou un PDF."""
+    if uploaded_file.name.lower().endswith(".pdf"):
+        return pdf_to_image(uploaded_file.getvalue())
+    return PIL.Image.open(uploaded_file).convert("RGB")
