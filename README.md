@@ -67,6 +67,18 @@ Ouvrez votre navigateur : [http://localhost:8501](http://localhost:8501)
 
 ---
 
+## **Présentation de quelques modules de l'applicationn**
+
+
+![Offres d'emploi](screenshot/Offresdemploi.png)
+
+![Clustering des offres](screenshot/ClustersOffres.png)
+
+![Ajout d'un CV et d'une lettre de motivation](screenshot/AjoutCVetLM.png)
+
+![Matching CV et offres](screenshot/Matching.png)
+
+
 ## 🔄 Arrêter les conteneurs
 
 ```bash
