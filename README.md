@@ -1,4 +1,5 @@
 # Challenge de fin d'année
+Dans le cadre du Master 2 SISE de l'Université Lumière Lyon 2, nous avons dû développer un projet IA de notre choix en 2 jours.
 ## Master SISE 2024-2025
 
 Notre équipe était constituée de **_Linh Nhi Le-Dinh_**, **_Daniella Rakotondratsimba_** et **_Joël Sollari_**.
