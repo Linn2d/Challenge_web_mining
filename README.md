@@ -1,9 +1,9 @@
-# Challenge de fin d'année
-Dans le cadre du Master 2 SISE de l'Université Lumière Lyon 2, nous avons dû développer un projet IA de notre choix en 2 jours.
-Nous avons crée une application de Matching de CV avec des offres d'emplois en utilisant des méthodes de NLP et des LLM.
-## Master SISE 2024-2025
+# Challenge de fin d'année : Matching CV / offres d'emploi
 
-Notre équipe était constituée de **_Linh Nhi Le-Dinh_**, **_Daniella Rakotondratsimba_** et **_Joël Sollari_**.
+Dans le cadre du Master 2 SISE de l'Université Lumière Lyon 2, nous avons dû développer un projet IA de notre choix en 2 jours.
+
+Nous avons créé une **application de matching entre offres d'emploi et CV**, en utilisant des méthodes de NLP et des LLM. Les offres d'emploi ont été collectées par scraping. L'utilisateur peut aussi **ajouter son propre CV et sa lettre de motivation** pour les comparer aux offres.
+
 
 # 🚀 Installation et utilisation de l'application
 
@@ -80,3 +80,5 @@ docker compose down -v
 ```
 
 **Bonne exploration !** 📚🛠️
+
+Notre équipe était constituée de **_Linh Nhi Le-Dinh_**, **_Daniella Rakotondratsimba_** et **_Joël Sollari_**.
