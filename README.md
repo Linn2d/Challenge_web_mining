@@ -1,7 +1,7 @@
 # Challenge de fin d'année
 ## Master SISE 2024-2025
 
-Notre équipe était constituée de **_Linh Nhi_**, **_Daniella Rakotondratsimba_** et **_Joël Sollari_**.
+Notre équipe était constituée de **_Linh Nhi Le-Dinh_**, **_Daniella Rakotondratsimba_** et **_Joël Sollari_**.
 
 
 # 🚀 Installation et utilisation de l'application
@@ -21,7 +21,7 @@ Bienvenue ! Voici comment installer et utiliser cette application facilement.
 Ouvrez un terminal, naviguez vers le dossier de votre choix et clonez le dépôt GitHub :
 
 ```bash
-git clone https://github.com/rtdaniella/Challenge_web_mining.git
+git clone https://github.com/Linn2d/Challenge_web_mining.git
 cd Challenge_web_mining
 ```
 
