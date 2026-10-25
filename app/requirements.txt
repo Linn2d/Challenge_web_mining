@@ -1,10 +1,10 @@
 streamlit
 pandas
-numpy
+numpy==2.2.6
 requests
 psycopg2-binary
 pdfplumber
-spacy
+spacy==3.8.7
 nltk
 bs4
 scikit-learn
@@ -18,3 +18,7 @@ matplotlib
 plotly
 sacremoses
 google-generativeai
+thinc==8.3.11
+cymem==2.0.11
+murmurhash==1.0.12
+preshed==3.0.9
