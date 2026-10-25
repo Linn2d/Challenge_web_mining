@@ -21,7 +21,6 @@ from st_aggrid import AgGrid, GridOptionsBuilder
 import logging
 import os
 import pandas as pd 
-import PIL.Image
 from processor import process_cv_with_gemini, insert_cv_dataframe
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
