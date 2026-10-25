@@ -78,6 +78,12 @@ Ouvrez votre navigateur : [http://localhost:8501](http://localhost:8501)
 
 ![Matching CV et offres](screenshot/Matching.png)
 
+Pour réaliser le matching entre les CV et les offres d’emploi, le modèle FlauBERT Base Uncased a été choisi pour sa capacité à traiter des textes en français.
+
+Les descriptions des offres et les informations des candidatures (compétences, expériences, formations et motivations) sont prétraitées puis transformées en vecteurs numériques (embeddings) grâce au modèle. La similarité cosinus est ensuite utilisée pour comparer ces vecteurs.
+
+Lorsqu’une offre est sélectionnée, l’application calcule sa similarité avec chaque candidature et affiche celle qui obtient le score le plus élevé. Ce score indique la proximité entre les textes, mais ne représente pas directement la probabilité de recrutement.
+
 
 ## 🔄 Arrêter les conteneurs
 
