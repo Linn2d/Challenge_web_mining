@@ -39,8 +39,6 @@ MISTRAL_API_KEY=votre_cle_mistral
 GEMINI_API_KEY=votre_cle_gemini
 ```
 
-⚠️ Ne commitez jamais ce fichier : il est dans le `.gitignore`.
-
 ---
 
 ## 🛠️ Démarrage des conteneurs Docker
